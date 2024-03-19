@@ -3,6 +3,8 @@
   import MeetupGrid from "./Meetups/MeetupGrid.svelte";
   import TextInput from "./UI/TextInput.svelte";
   import Button from "./UI/Button.svelte";
+  import EditMeetup from "./Meetups/EditMeetup.svelte";
+
   let meetups = [
     {
       id: "m0",
@@ -14,6 +16,7 @@
         "https://addicted2success.com/wp-content/uploads/2018/06/8-Reasons-You-Should-Join-a-Meetup-Group-Today.jpg",
       address: "27th Nerd Road, 32523 new Yourk",
       contactEmail: "code@test.com",
+      isFavorite: false,
     },
     {
       id: "m1",
@@ -25,6 +28,7 @@
         "https://addicted2success.com/wp-content/uploads/2018/06/8-Reasons-You-Should-Join-a-Meetup-Group-Today.jpg",
       address: "27th Nerd Road, 32523 new Yourk",
       contactEmail: "code@test.com",
+      isFavorite: false,
     },
     {
       id: "m2",
@@ -36,6 +40,7 @@
         "https://addicted2success.com/wp-content/uploads/2018/06/8-Reasons-You-Should-Join-a-Meetup-Group-Today.jpg",
       address: "27th Nerd Road, 32523 new Yourk",
       contactEmail: "code@test.com",
+      isFavorite: false,
     },
     {
       id: "m3",
@@ -47,8 +52,11 @@
         "https://addicted2success.com/wp-content/uploads/2018/06/8-Reasons-You-Should-Join-a-Meetup-Group-Today.jpg",
       address: "27th Nerd Road, 32523 new Yourk",
       contactEmail: "code@test.com",
+      isFavorite: false,
     },
   ];
+
+  let editMode = null;
 
   let title = "";
   let subtitle = "";
@@ -57,7 +65,17 @@
   let address = "";
   let imageUrl = "";
 
-  const addMeetup = () => {
+  function toggleFavorite(event) {
+    const id = event.detail;
+    const updatedMeetup = { ...meetups.find((e) => e.id === id) };
+    updatedMeetup.isFavorite = !updatedMeetup.isFavorite;
+    const meetupIndex = meetups.findIndex((e) => e.id === id);
+    const updatedMeetups = [...meetups];
+    updatedMeetups[meetupIndex] = updatedMeetup;
+    meetups = updatedMeetups;
+  }
+
+  export const addMeetup = () => {
     const newMeetup = {
       id: Math.random().toString(),
       title: title,
@@ -66,63 +84,25 @@
       contactEmail: email,
       address: address,
       imageUrl: imageUrl,
+      isFavorite: false,
     };
-    console.log(newMeetup);
     meetups = [newMeetup, ...meetups];
   };
 </script>
 
 <Header />
 <main>
-  <form on:submit|preventDefault={addMeetup}>
-    <TextInput
-      name="title"
-      label="Title"
-      value={title}
-      on:input={(e) => (title = e.target.value)}
-    />
-    <TextInput
-      name="subtitle"
-      label="Subtitle"
-      value={subtitle}
-      on:input={(e) => (subtitle = e.target.value)}
-    />
-    <TextInput
-      name="address"
-      label="Address"
-      value={address}
-      on:input={(e) => (address = e.target.value)}
-    />
-    <TextInput
-      name="email"
-      label="E-mail"
-      value={email}
-      on:input={(e) => (email = e.target.value)}
-    />
-    <TextInput
-      name="imageUrl"
-      label="Image URL"
-      value={imageUrl}
-      on:input={(e) => (email = e.target.value)}
-    />
-    <TextInput
-      name="description"
-      label="Description"
-      value={description}
-      controlType="textarea"
-      rows="3"
-      on:input={(e) => (description = e.target.value)}
-    />
-    <Button type="submit" caption="Save" />
-  </form>
-  <MeetupGrid {meetups} />
+  <div class="button">
+    <Button caption="Add Meetup" on:click={() => (editMode = "add")} />
+  </div>
+  {#if editMode === "add"}
+    <EditMeetup />
+  {/if}
+  <MeetupGrid {meetups} on:togglefavorite={toggleFavorite} />
 </main>
 
 <style>
-  form {
-    margin: auto;
+  .button {
     margin-top: 5rem;
-    width: 30rem;
-    max-width: 90%;
   }
 </style>
